@@ -4,6 +4,9 @@ Changelog for package vda5050_core
 
 Forthcoming
 -----------
+* docs(client): readme and how-to guides for client adapter (`#87 <https://github.com/ros-industrial/vda5050_core/issues/87>`_)
+* fix(client): pass action execution param as json (`#86 <https://github.com/ros-industrial/vda5050_core/issues/86>`_)
+* fix(master): order rejection callback (`#82 <https://github.com/ros-industrial/vda5050_core/issues/82>`_)
 * fix(client): transform node positions if a transformation is available (`#80 <https://github.com/ros-industrial/vda5050_core/issues/80>`_)
 * feat(client): provide initial adapter interface along with rmf migration guide (`#71 <https://github.com/ros-industrial/vda5050_core/issues/71>`_)
 * feat(master): add order lifecycle, stitcher, instant actions, mode handling, and pose_view (`#69 <https://github.com/ros-industrial/vda5050_core/issues/69>`_)
