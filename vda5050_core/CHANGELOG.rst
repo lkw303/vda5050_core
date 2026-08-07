@@ -37,4 +37,4 @@ Forthcoming
   * C++ packaging related (`#27 <https://github.com/ros-industrial/vda5050_core/issues/27>`_, `#43 <https://github.com/ros-industrial/vda5050_core/issues/43>`_, `#44 <https://github.com/ros-industrial/vda5050_core/issues/44>`_)
   * CI and Github Actions (`#35 <https://github.com/ros-industrial/vda5050_core/issues/35>`_, `#25 <https://github.com/ros-industrial/vda5050_core/issues/25>`_, `#6 <https://github.com/ros-industrial/vda5050_core/issues/6>`_)
 
-* Contributors: Chen Bainian, Eileen Teoh Yan Zhen, John Arman Abogado, Leah, Saurabh Kamat, Lim Yew Hao, Glenn Tan, Shawn Chan
+* Contributors: Chen Bainian, Eileen Teoh Yan Zhen, John Arman Abogado, Leah, Saurabh Kamat, Lim Yew Hao, Glenn Tan, Shawn Chan, Tinapat Game Limsila
