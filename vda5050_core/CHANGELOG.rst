@@ -6,30 +6,22 @@ Forthcoming
 -----------
 * Client Library
 
-  * feat: provide initial adapter interface along with rmf migration guide
+  * feat: provide initial adapter interface along with rmf migration guide (`#71 <https://github.com/ros-industrial/vda5050_core/issues/71>`_, `#80 <https://github.com/ros-industrial/vda5050_core/issues/80>`_, `#86 <https://github.com/ros-industrial/vda5050_core/issues/86>`_)
 
-    * `#71 <https://github.com/ros-industrial/vda5050_core/issues/71>`_
-    * `#80 <https://github.com/ros-industrial/vda5050_core/issues/80>`_
-    * `#86 <https://github.com/ros-industrial/vda5050_core/issues/86>`_
-  * docs: readme and how-to guides for client adapter (`#87 <https://github.com/ros-industrial/vda5050_core/issues/87>`_)
-  * feat: add order validator and acceptance strategy (`#31 <https://github.com/ros-industrial/vda5050_core/issues/31>`_, `#63 <https://github.com/ros-industrial/vda5050_core/issues/63>`_)
-  * feat: add AGVContext and execution tracking resource (`#62 <https://github.com/ros-industrial/vda5050_core/issues/62>`_, `#66 <https://github.com/ros-industrial/vda5050_core/issues/66>`_)
-  * feat: add concrete execution data types (`#53 <https://github.com/ros-industrial/vda5050_core/issues/53>`_)
-  * feat: add StateManager (`#14 <https://github.com/ros-industrial/vda5050_core/issues/14>`_)
-  
+    * docs: readme and how-to guides for client adapter (`#87 <https://github.com/ros-industrial/vda5050_core/issues/87>`_)
+    * feat: add order validator and acceptance strategy (`#31 <https://github.com/ros-industrial/vda5050_core/issues/31>`_, `#63 <https://github.com/ros-industrial/vda5050_core/issues/63>`_)
+    * feat: add AGVContext and execution tracking resource (`#62 <https://github.com/ros-industrial/vda5050_core/issues/62>`_, `#66 <https://github.com/ros-industrial/vda5050_core/issues/66>`_)
+    * feat: add concrete execution data types (`#53 <https://github.com/ros-industrial/vda5050_core/issues/53>`_)
+    * feat: add StateManager (`#14 <https://github.com/ros-industrial/vda5050_core/issues/14>`_)
+
 * Master Library
 
-  * feat: add initial implementation of VDA5050 Master
+  * feat: add initial implementation of VDA5050 Master (`#20 <https://github.com/ros-industrial/vda5050_core/issues/20>`_, `#45 <https://github.com/ros-industrial/vda5050_core/issues/45>`_, `#59 <https://github.com/ros-industrial/vda5050_core/issues/59>`_, `#78 <https://github.com/ros-industrial/vda5050_core/issues/78>`_)
 
-    * `#20 <https://github.com/ros-industrial/vda5050_core/issues/20>`_
-    * `#45 <https://github.com/ros-industrial/vda5050_core/issues/45>`_
-    * `#59 <https://github.com/ros-industrial/vda5050_core/issues/59>`_
-    * `#78 <https://github.com/ros-industrial/vda5050_core/issues/78>`_
-  * feat: add order lifecycle, stitcher, instant actions, mode handling, and pose_view (`#69 <https://github.com/ros-industrial/vda5050_core/issues/69>`_, `#82 <https://github.com/ros-industrial/vda5050_core/issues/82>`_)
-  * feat: master-side event detectors and heartbeat hardening (`#58 <https://github.com/ros-industrial/vda5050_core/issues/58>`_)
-  * feat: add traversability, action-conflict, factsheet, and mode validators (`#56 <https://github.com/ros-industrial/vda5050_core/issues/56>`_)
-  * feat: add schema and pre-send validators (`#55 <https://github.com/ros-industrial/vda5050_core/issues/55>`_)
-
+    * feat: add order lifecycle, stitcher, instant actions, mode handling, and pose_view (`#69 <https://github.com/ros-industrial/vda5050_core/issues/69>`_, `#82 <https://github.com/ros-industrial/vda5050_core/issues/82>`_)
+    * feat: master-side event detectors and heartbeat hardening (`#58 <https://github.com/ros-industrial/vda5050_core/issues/58>`_)
+    * feat: add traversability, action-conflict, factsheet, and mode validators (`#56 <https://github.com/ros-industrial/vda5050_core/issues/56>`_)
+    * feat: add schema and pre-send validators (`#55 <https://github.com/ros-industrial/vda5050_core/issues/55>`_)
   
 * Core Library
 
@@ -39,7 +31,6 @@ Forthcoming
   * feat(serialization): add common (de)serializers for C++ structs and ROS 2 msgs (`#10 <https://github.com/ros-industrial/vda5050_core/issues/10>`_, `#24 <https://github.com/ros-industrial/vda5050_core/issues/24>`_)
   * feat(layout): add LIF topology graph and JSON loader (`#54 <https://github.com/ros-industrial/vda5050_core/issues/54>`_)
   * feat(execution): add execution utilities (`#28 <https://github.com/ros-industrial/vda5050_core/issues/28>`_, `#36 <https://github.com/ros-industrial/vda5050_core/issues/36>`_, `#50 <https://github.com/ros-industrial/vda5050_core/issues/50>`_)
-
 
 * Others
 
