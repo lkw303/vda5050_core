@@ -52,29 +52,27 @@ void signal_handler(int signal)
   running = false;
 }
 
-int main()
+std::shared_ptr<Adapter> make_numbered_adapter(int num)
 {
-  std::signal(SIGINT, signal_handler);
-  std::signal(SIGTERM, signal_handler);
 
-  auto mqtt_client = vda5050_core::transport::create_default_client_unique(
-    "tcp://localhost:1883", "adapter_example");
+ auto mqtt_client = vda5050_core::transport::create_default_client_unique(
+    "tcp://localhost:1883", "adapter_example_" + std::to_string(num));
 
   auto protocol_adapter = ProtocolAdapter::make(
-    std::move(mqtt_client), "uagv", "2.0.0", "Manufacturer", "S001");
+    std::move(mqtt_client), "uagv", "2.0.0", "Manufacturer", "S00" + std::to_string(num));
 
   auto adapter = Adapter::make(protocol_adapter);
 
   auto state_manager = adapter->state_manager();
 
-  adapter->on_navigate([state_manager](
+  adapter->on_navigate([state_manager, num](
                          NodeRequest node_request,
                          std::optional<EdgeRequest> /*edge_request*/,
                          std::shared_ptr<OrderExecution> execution) {
     VDA5050_INFO_STREAM(
       "Navigating to node [" << node_request.node_id() << "]");
 
-    std::thread([node_request, execution, state_manager]() {
+    std::thread([node_request, execution, state_manager, num]() {
       state_manager->set_driving(true);
 
       std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -83,7 +81,7 @@ int main()
 
       execution->finished();
 
-      VDA5050_INFO_STREAM("Reached node [" << node_request.node_id() << "]");
+      VDA5050_INFO_STREAM("AMR[" << std::to_string(num) << "]: Reached node [" << node_request.node_id() << "]");
 
       auto position = node_request.node_position();
       if (position.has_value())
@@ -120,16 +118,47 @@ int main()
 
       execution->finished();
     });
+  return adapter;
+}
 
-  adapter->start();
-  VDA5050_INFO("Adapter started ...");
+void make_adapters(std::vector<std::shared_ptr<Adapter>> & adapters, int num)
+{
+  for (int i = 0; i < num; i++) {
+    adapters.push_back(make_numbered_adapter(i));
+  }
+}
+
+int main()
+{
+  std::signal(SIGINT, signal_handler);
+  std::signal(SIGTERM, signal_handler);
+  
+  int num_robots = 200;
+  std::vector<std::shared_ptr<Adapter>> adapters;
+  adapters.reserve(num_robots);
+
+  make_adapters(adapters, num_robots);
+  int i = 0;
+  for (auto & a : adapters) {
+
+    VDA5050_INFO_STREAM("Adapter [" << std::to_string(i) << "]: started ...");
+    std::thread([a]() {
+      a->start();
+    });
+    i++;
+  }
 
   while (running)
   {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
-  adapter->stop();
+  for (auto & a: adapters)
+  {
+    std::thread([a]() {
+      a->stop();
+    });
+  }
 
   return 0;
 }
