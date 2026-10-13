@@ -52,6 +52,13 @@ void signal_handler(int signal)
   running = false;
 }
 
+std::string serial_for(int index)
+{
+  char buf[16];
+  std::snprintf(buf, sizeof(buf), "S%03d", index + 1);
+  return buf;
+}
+
 std::shared_ptr<Adapter> make_numbered_adapter(int num)
 {
 
@@ -59,7 +66,7 @@ std::shared_ptr<Adapter> make_numbered_adapter(int num)
     "tcp://localhost:1883", "adapter_example_" + std::to_string(num));
 
   auto protocol_adapter = ProtocolAdapter::make(
-    std::move(mqtt_client), "uagv", "2.0.0", "Manufacturer", "S00" + std::to_string(num));
+    std::move(mqtt_client), "uagv", "2.0.0", "Manufacturer", serial_for(num));
 
   auto adapter = Adapter::make(protocol_adapter);
 
@@ -144,7 +151,7 @@ int main()
     VDA5050_INFO_STREAM("Adapter [" << std::to_string(i) << "]: started ...");
     std::thread([a]() {
       a->start();
-    });
+    }).detach();
     i++;
   }
 
@@ -157,7 +164,7 @@ int main()
   {
     std::thread([a]() {
       a->stop();
-    });
+    }).detach();
   }
 
   return 0;
