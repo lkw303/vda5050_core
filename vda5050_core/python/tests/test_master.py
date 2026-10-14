@@ -90,7 +90,7 @@ def test_master_last_connected(mock_mqtt_client):
     assert broker_status.last_disconnect_at is None
 
     # disconnect from master
-    disconnected_at = datetime.now()  # noqa: DTZ005
+    disconnected_at = datetime.now()
     master.disconnect()
     broker_status = master.get_broker_status()
     assert broker_status.connected is False
