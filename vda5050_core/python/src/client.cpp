@@ -31,11 +31,11 @@
 #include "vda5050_core/client/adapter/order_execution.hpp"
 #include "vda5050_core/client/adapter/state_manager.hpp"
 #include "vda5050_core/client/adapter/transformation.hpp"
+#include "vda5050_core/execution/protocol_adapter.hpp"
 #include "vda5050_core/types/action_state.hpp"
 #include "vda5050_core/types/action_status.hpp"
 #include "vda5050_core/types/agv_position.hpp"
 #include "vda5050_core/types/battery_state.hpp"
-#include "vda5050_core/execution/protocol_adapter.hpp"
 #include "vda5050_core/types/e_stop.hpp"
 #include "vda5050_core/types/error.hpp"
 #include "vda5050_core/types/error_level.hpp"
@@ -168,8 +168,7 @@ void bind_client(py::module_& m)
     .def(
       "paused", &ActionExecution::paused,
       py::arg("result_description") = std::nullopt)
-    .def(
-      "finished", py::overload_cast<>(&ActionExecution::finished))
+    .def("finished", py::overload_cast<>(&ActionExecution::finished))
     .def(
       "finished",
       py::overload_cast<std::optional<std::string>>(&ActionExecution::finished),
