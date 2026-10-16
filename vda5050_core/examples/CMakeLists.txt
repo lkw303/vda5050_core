@@ -50,6 +50,13 @@ target_link_libraries(master_multi_example PUBLIC
   ${PROJECT_NAME}::logger
 )
 
+add_executable(master_diagonal_example master/master_diagonal_example.cpp)
+target_link_libraries(master_diagonal_example PUBLIC
+  ${PROJECT_NAME}::master
+  ${PROJECT_NAME}::transport
+  ${PROJECT_NAME}::logger
+)
+
 install(TARGETS
     custom_base
     provider_example
@@ -59,5 +66,6 @@ install(TARGETS
     order_publisher
     master_example
     master_multi_example
+    master_diagonal_example
   DESTINATION lib/${PROJECT_NAME}
 )
