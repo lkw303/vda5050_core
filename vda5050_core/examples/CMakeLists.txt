@@ -29,6 +29,13 @@ target_link_libraries(adapter_example PUBLIC
   ${PROJECT_NAME}::logger
 )
 
+add_executable(adapter_stats_example client/adapter_stats_example.cpp)
+target_link_libraries(adapter_stats_example PUBLIC
+  ${PROJECT_NAME}::client
+  ${PROJECT_NAME}::transport
+  ${PROJECT_NAME}::logger
+)
+
 add_executable(order_publisher master/order_publisher.cpp)
 target_link_libraries(order_publisher PUBLIC
   ${PROJECT_NAME}::transport
@@ -38,6 +45,13 @@ target_link_libraries(order_publisher PUBLIC
 
 add_executable(master_example master/master_example.cpp)
 target_link_libraries(master_example PUBLIC
+  ${PROJECT_NAME}::master
+  ${PROJECT_NAME}::transport
+  ${PROJECT_NAME}::logger
+)
+
+add_executable(master_benchmark master/master_benchmark.cpp)
+target_link_libraries(master_benchmark PUBLIC
   ${PROJECT_NAME}::master
   ${PROJECT_NAME}::transport
   ${PROJECT_NAME}::logger
@@ -57,15 +71,25 @@ target_link_libraries(master_diagonal_example PUBLIC
   ${PROJECT_NAME}::logger
 )
 
+add_executable(master_diagonal_v2_example master/master_diagonal_v2_example.cpp)
+target_link_libraries(master_diagonal_v2_example PUBLIC
+  ${PROJECT_NAME}::master
+  ${PROJECT_NAME}::transport
+  ${PROJECT_NAME}::logger
+)
+
 install(TARGETS
     custom_base
     provider_example
     engine_example
     handler_integration
     adapter_example
+    adapter_stats_example
     order_publisher
     master_example
+    master_benchmark
     master_multi_example
     master_diagonal_example
+    master_diagonal_v2_example
   DESTINATION lib/${PROJECT_NAME}
 )
