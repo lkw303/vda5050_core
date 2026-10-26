@@ -373,12 +373,15 @@ void VDA5050Master::offboard_agv(
     agv = std::move(it->second);
     agvs_.erase(it);
   }
+  VDA5050_INFO("Removed AGV [{}] from agv map", agv_id);
 
   // Stop, then destroy so the dtor unsubscribes before we drop the baselines —
   // otherwise an in-flight State/Connection could re-seed them after forget.
   agv->stop();
   agv.reset();
+  VDA5050_INFO("Stopped AGV [{}] from agv map", agv_id);
   master_context_.forget_agv(agv_id);
+  VDA5050_INFO("Forgot AGV [{}] from agv map", agv_id);
 
   {
     std::lock_guard<std::mutex> lock(map_mutex_);

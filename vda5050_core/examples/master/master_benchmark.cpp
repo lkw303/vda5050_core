@@ -230,6 +230,7 @@ Stats stats_of(const std::vector<double> & v)
 
 int main(int argc, char ** argv)
 {
+  vda5050_core::logger::set_log_level(vda5050_core::logger::LogLevel::DEBUG);
   const Options opt = parse_args(argc, argv);
   std::signal(SIGINT, signal_handler);
   std::signal(SIGTERM, signal_handler);
@@ -362,7 +363,7 @@ int main(int argc, char ** argv)
   rejected = 0;  // report only rejections inside the window
   measuring = true;
   while (running) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     const auto now = Clock::now();
     if (opt.duration > 0 && seconds_between(run_start, now) >= opt.duration) {
       break;
@@ -418,6 +419,7 @@ int main(int argc, char ** argv)
 
   // --- Shutdown ------------------------------------------------------------
   for (int i = 0; i < n; ++i) {
+    VDA5050_INFO("Attempting to offboard AGV[{}]", serial_for(i));
     master->offboard_agv(opt.manufacturer, serial_for(i));
   }
   master->disconnect();

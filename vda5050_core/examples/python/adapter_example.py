@@ -32,7 +32,9 @@ MQTT_CLIENT_ID = os.environ.get("ROBOT_MQTT_CLIENT_ID", "adapter_example")
 INTERFACE_NAME = "uagv"
 VERSION = "2.0.0"
 MANUFACTURER = os.environ.get("VDA5050_MANUFACTURER", "Manufacturer")
-SERIAL_NUMBER = os.environ.get("VDA5050_SERIAL_NUMBER", "S001")
+DRIVE_TIME_S = float(os.environ.get("DRIVE_TIME_S", "2"))
+ACTION_TIME_S = float(os.environ.get("ACTION_TIME_S", "1"))
+NUM_ROBOTS = int(os.environ.get("NUM_ROBOTS", "1"))
 LOGGER = logging.getLogger(__name__)
 
 running = threading.Event()
@@ -44,16 +46,16 @@ def signal_handler(signum, _frame) -> None:
     running.clear()
 
 
-def main() -> None:
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
-    )
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+def serial_for(index: int) -> str:
+    return f"S{index + 1:03d}"
 
-    mqtt_client = create_default_client_shared(BROKER_URI, MQTT_CLIENT_ID)
+
+def make_numbered_adapter(num: int) -> Adapter:
+    mqtt_client = create_default_client_shared(
+        BROKER_URI, f"{MQTT_CLIENT_ID}_{num}"
+    )
     protocol_adapter = ProtocolAdapter.make(
-        mqtt_client, INTERFACE_NAME, VERSION, MANUFACTURER, SERIAL_NUMBER
+        mqtt_client, INTERFACE_NAME, VERSION, MANUFACTURER, serial_for(num)
     )
     adapter = Adapter.make(protocol_adapter)
     state_manager = adapter.state_manager()
@@ -63,7 +65,7 @@ def main() -> None:
 
         def drive() -> None:
             state_manager.set_driving(True)
-            time.sleep(2)
+            time.sleep(DRIVE_TIME_S)
             state_manager.set_driving(False)
 
             execution.finished()
@@ -84,7 +86,7 @@ def main() -> None:
         LOGGER.info("Action of type [%s] requested", request.action_type())
 
         execution.running()
-        time.sleep(1)
+        time.sleep(ACTION_TIME_S)
         execution.finished()
 
     def on_localize(request, execution) -> None:
@@ -104,15 +106,27 @@ def main() -> None:
     adapter.on_navigate(on_navigate)
     adapter.on_action(on_action)
     adapter.on_localize(on_localize)
+    return adapter
 
-    adapter.start()
-    LOGGER.info("Adapter started ...")
+
+def main() -> None:
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s"
+    )
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    adapters = [make_numbered_adapter(i) for i in range(NUM_ROBOTS)]
+    for i, adapter in enumerate(adapters):
+        adapter.start()
+        LOGGER.info("Adapter [%d]: started ...", i)
 
     try:
         while running.is_set():
             time.sleep(1)
     finally:
-        adapter.stop()
+        for adapter in adapters:
+            threading.Thread(target=adapter.stop, daemon=True).start()
 
 
 if __name__ == "__main__":

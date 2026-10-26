@@ -19,8 +19,13 @@
 #include <atomic>
 #include <chrono>
 #include <csignal>
+#include <cstdio>
+#include <iostream>
 #include <memory>
+#include <optional>
+#include <string>
 #include <thread>
+#include <vector>
 
 #include "vda5050_core/execution/protocol_adapter.hpp"
 #include "vda5050_core/logger/logger.hpp"
@@ -52,6 +57,90 @@ void signal_handler(int signal)
   running = false;
 }
 
+// Settings are read from the command line arguments in main(), falling back to
+// the defaults.
+std::string BROKER_URI = "tcp://localhost:1883";
+std::string MQTT_CLIENT_ID = "adapter_example";
+std::string MANUFACTURER = "Manufacturer";
+int NUM_ROBOTS = 200;
+double DRIVE_TIME_S = 2.0;
+double ACTION_TIME_S = 1.0;
+double SLEEP_TIME_S = 0.2;
+
+void print_usage(const char * program)
+{
+  std::cerr << "Usage: " << program << " [options]\n"
+            << "  --broker <uri>          MQTT broker URI (default: "
+            << BROKER_URI << ")\n"
+            << "  --client-id <id>        MQTT client ID prefix (default: "
+            << MQTT_CLIENT_ID << ")\n"
+            << "  --manufacturer <name>   VDA5050 manufacturer (default: "
+            << MANUFACTURER << ")\n"
+            << "  --num-robots <n>        Number of robots (default: "
+            << NUM_ROBOTS << ")\n"
+            << "  --drive-time <s>        Drive time in seconds (default: "
+            << DRIVE_TIME_S << ")\n"
+            << "  --action-time <s>       Action time in seconds (default: "
+            << ACTION_TIME_S << ")\n"
+            << "  --sleep-time <s>        Main loop sleep in seconds (default: "
+            << SLEEP_TIME_S << ")\n"
+            << "  -h, --help              Show this message" << std::endl;
+}
+
+// Accepts both "--name value" and "--name=value".
+bool parse_args(int argc, char ** argv)
+{
+  try {
+    for (int i = 1; i < argc; i++) {
+      std::string name = argv[i];
+      std::string value;
+      bool has_value = false;
+
+      const auto eq = name.find('=');
+      if (name.rfind("--", 0) == 0 && eq != std::string::npos) {
+        value = name.substr(eq + 1);
+        name = name.substr(0, eq);
+        has_value = true;
+      }
+
+      if (name == "-h" || name == "--help") {
+        return false;
+      }
+
+      if (!has_value) {
+        if (i + 1 >= argc) {
+          std::cerr << "Missing value for " << name << std::endl;
+          return false;
+        }
+        value = argv[++i];
+      }
+
+      if (name == "--broker") {
+        BROKER_URI = value;
+      } else if (name == "--client-id") {
+        MQTT_CLIENT_ID = value;
+      } else if (name == "--manufacturer") {
+        MANUFACTURER = value;
+      } else if (name == "--n-robots") {
+        NUM_ROBOTS = std::stoi(value);
+      } else if (name == "--drive-time") {
+        DRIVE_TIME_S = std::stod(value);
+      } else if (name == "--action-time") {
+        ACTION_TIME_S = std::stod(value);
+      } else if (name == "--sleep-time") {
+        SLEEP_TIME_S = std::stod(value);
+      } else {
+        std::cerr << "Unknown argument: " << name << std::endl;
+        return false;
+      }
+    }
+  } catch (const std::exception & e) {
+    std::cerr << "Invalid argument: " << e.what() << std::endl;
+    return false;
+  }
+  return true;
+}
+
 std::string serial_for(int index)
 {
   char buf[16];
@@ -61,12 +150,11 @@ std::string serial_for(int index)
 
 std::shared_ptr<Adapter> make_numbered_adapter(int num)
 {
-
- auto mqtt_client = vda5050_core::transport::create_default_client_unique(
-    "tcp://localhost:1883", "adapter_example_" + std::to_string(num));
+  auto mqtt_client = vda5050_core::transport::create_default_client_unique(
+    BROKER_URI, MQTT_CLIENT_ID + "_" + std::to_string(num));
 
   auto protocol_adapter = ProtocolAdapter::make(
-    std::move(mqtt_client), "uagv", "2.0.0", "Manufacturer", serial_for(num));
+    std::move(mqtt_client), "uagv", "2.0.0", MANUFACTURER, serial_for(num));
 
   auto adapter = Adapter::make(protocol_adapter);
 
@@ -82,7 +170,7 @@ std::shared_ptr<Adapter> make_numbered_adapter(int num)
     std::thread([node_request, execution, state_manager, num]() {
       state_manager->set_driving(true);
 
-      std::this_thread::sleep_for(std::chrono::seconds(2));
+      std::this_thread::sleep_for(std::chrono::duration<double>(DRIVE_TIME_S));
 
       state_manager->set_driving(false);
 
@@ -108,7 +196,7 @@ std::shared_ptr<Adapter> make_numbered_adapter(int num)
 
       execution->running();
 
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+      std::this_thread::sleep_for(std::chrono::duration<double>(ACTION_TIME_S));
 
       execution->finished();
     });
@@ -135,12 +223,17 @@ void make_adapters(std::vector<std::shared_ptr<Adapter>> & adapters, int num)
   }
 }
 
-int main()
+int main(int argc, char ** argv)
 {
+  if (!parse_args(argc, argv)) {
+    print_usage(argv[0]);
+    return 1;
+  }
+
   std::signal(SIGINT, signal_handler);
   std::signal(SIGTERM, signal_handler);
   
-  int num_robots = 200;
+  const int num_robots = NUM_ROBOTS;
   std::vector<std::shared_ptr<Adapter>> adapters;
   adapters.reserve(num_robots);
 
@@ -157,7 +250,7 @@ int main()
 
   while (running)
   {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::duration<double>(SLEEP_TIME_S));
   }
 
   for (auto & a: adapters)
